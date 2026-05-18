@@ -509,11 +509,135 @@ def run_agentic_reflection(end_date: str, dry_run: bool = False, force: bool = F
     else:
         print("[*] No promotion drafts generated.")
 
+    # Execute GC on OBSERVATIONS.md
+    gc_plan = data.get("gc_plan", {})
+    if gc_plan.get("entries_to_remove"):
+        n = execute_observations_gc(gc_plan, OBSERVATIONS_PATH)
+        if n > 0:
+            print(f"[gc] Removed {n} expired entries from OBSERVATIONS.md")
+        else:
+            print("[gc] No matching entries found for removal.")
+    else:
+        print("[*] No GC removals suggested.")
+
     # Auto-commit and push to GitHub (async, non-blocking)
-    _git_auto_sync(end_date, [reflection_path] + [PROMOTIONS_DIR])
+    _git_auto_sync(end_date, [reflection_path, OBSERVATIONS_PATH] + [PROMOTIONS_DIR])
 
     print("[*] Done.")
     return 0
+
+
+def execute_observations_gc(gc_plan: dict, observations_path: Path) -> int:
+    """Delete entries from OBSERVATIONS.md that are marked for removal in the GC plan.
+
+    Returns the number of entries removed.
+    """
+    to_remove = gc_plan.get("entries_to_remove", [])
+    if not to_remove:
+        return 0
+
+    if not observations_path.exists():
+        print("[!] OBSERVATIONS.md not found, skipping GC.")
+        return 0
+
+    lines = observations_path.read_text(encoding="utf-8").splitlines()
+    removed = 0
+
+    for entry in to_remove:
+        entry_date = entry.get("date", "")
+        summary = entry.get("summary", "")
+        if not entry_date or not summary:
+            continue
+
+        # Find the matching line: must be within the correct date block
+        in_target_date = False
+        for i, line in enumerate(lines):
+            if line is None:
+                continue
+            if line.strip().startswith(f"### Date: {entry_date}"):
+                in_target_date = True
+                continue
+            if in_target_date and line.strip().startswith("### Date:"):
+                in_target_date = False  # moved past this date block
+                continue
+
+            if in_target_date and line.strip().startswith("-"):
+                # Check if summary is a substring of this entry (fuzzy)
+                if _summary_matches(summary, line):
+                    # Remove the entry line itself
+                    lines[i] = None  # mark for deletion
+                    # Also remove the following line if it's a continuation (starts with whitespace, not a section header or bullet)
+                    j = i + 1
+                    while j < len(lines) and lines[j] is not None:
+                        trailing = lines[j].strip()
+                        if trailing == "" or trailing.startswith("🔴") or trailing.startswith("🟡") or trailing.startswith("🟢") or trailing.startswith("###") or trailing.startswith("-"):
+                            break
+                        lines[j] = None
+                        j += 1
+                    removed += 1
+                    break  # matched, move to next entry
+
+    # Filter out None-marked lines
+    cleaned = [l for l in lines if l is not None]
+
+    # Clean up empty priority sections: if a 🔴/🟡/🟢 header has no bullet entries after it, remove the header
+    result = []
+    i = 0
+    while i < len(cleaned):
+        line = cleaned[i]
+        stripped = line.strip()
+        # Check if this is a priority header
+        is_header = any(stripped.startswith(p) for p in ["🔴", "🟡", "🟢"])
+        if is_header:
+            # Look ahead: is there at least one "-" bullet before the next header or date?
+            has_bullets = False
+            for j in range(i + 1, len(cleaned)):
+                ahead = cleaned[j].strip()
+                if ahead.startswith("### Date:") or any(ahead.startswith(p) for p in ["🔴", "🟡", "🟢"]):
+                    break
+                if ahead.startswith("-"):
+                    has_bullets = True
+                    break
+            if has_bullets:
+                result.append(line)
+            # else: skip this empty header
+        else:
+            result.append(line)
+        i += 1
+
+    # Collapse triple+ blank lines into double
+    final = []
+    blank_count = 0
+    for line in result:
+        if line.strip() == "":
+            blank_count += 1
+            if blank_count <= 2:
+                final.append(line)
+        else:
+            blank_count = 0
+            final.append(line)
+
+    observations_path.write_text("\n".join(final) + "\n", encoding="utf-8")
+    return removed
+
+
+def _summary_matches(summary: str, line: str) -> bool:
+    """Check if a GC summary matches an observation line.
+
+    Uses keyword overlap: if >= 60% of summary keywords appear in the line, it's a match.
+    """
+    # Extract meaningful keywords from summary (2+ char words, skip common words)
+    stop = {"的", "了", "在", "是", "有", "和", "与", "或", "为", "等", "已", "从", "到", "将", "把",
+            "a", "an", "the", "is", "are", "was", "were", "been", "be", "to", "of", "in", "for",
+            "on", "with", "at", "by", "from", "as", "or", "and", "not", "but", "if", "so", "we",
+            "it", "its", "they", "this", "that", "these", "those", "has", "have", "had", "do", "does"}
+    keywords = [w for w in re.findall(r"[\w一-鿿]+", summary.lower())
+                if len(w) >= 2 and w not in stop]
+    if not keywords:
+        return False
+    line_lower = line.lower()
+    hits = sum(1 for kw in keywords if kw in line_lower)
+    return hits / len(keywords) >= 0.5
 
 
 def _git_auto_sync(end_date: str, paths: list[Path]) -> None:
