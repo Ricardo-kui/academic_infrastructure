@@ -27,6 +27,7 @@ status: active
 - **t03_so_what_who_cares.md** — 如果不改变读者的prior，就不是贡献
 - **t04_mechanism_must_penetrates_blackbox.md** — 机制解释必须穿透黑箱
 - **t05_boundary_conditions_are_not_afterthoughts.md** — 边界条件是理论精确化的核心工具
+- **t06_conditionalize_theoretical_frameworks.md** — 二元对立框架应转化为条件化框架 [provisional]
 
 ### e* — Empirical & Identification
 
@@ -43,6 +44,9 @@ status: active
 - **w03_tables_must_be_self_contained.md** — 表格必须自解释
 - **w04_intro_promises_must_be_cashed_in_discussion.md** — Introduction承诺必须在Discussion中兑现
 - **w05_avoid_ai_vocabulary_at_all_costs.md** — AI味写作是学术credibility poison
+- **w06_paragraph_triad_structure.md** — 每个段落必须是完整的论证单元（主题句→支持句→结尾句）
+- **w07_topic_sentence_precision.md** — 主题句必须兼具话题指向和核心观点
+- **w08_supporting_sentences_chain.md** — 支持句必须是环环相扣的论证链
 
 ### p* — Project Management
 
@@ -50,6 +54,7 @@ status: active
 - **p02_reviewer_response_is_part_of_writing.md** — 审稿回复是写作的一部分
 - **p03_deadline_drives_scope_not_quality.md** — Deadline驱动scope，不驱动quality
 - **p04_rejection_is_information_not_failure.md** — Rejection是信息，不是失败
+- **p05_standardize_data_infrastructure_across_projects.md** — 多项目共享数据源时必须统一基础设施
 
 ## 使用指南
 

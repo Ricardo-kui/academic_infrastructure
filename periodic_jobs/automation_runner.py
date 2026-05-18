@@ -4,9 +4,9 @@ automation_runner.py — Orchestrate the academic infrastructure pipeline.
 
 Modes:
     daily    : observer → consolidate → dashboard
-    agentic  : agentic_observer (Kimi) → consolidate → dashboard
-    weekly   : daily + bridge → reflector
-    full     : observer → consolidate → dashboard → bridge → reflector
+    agentic  : agentic_observer (LLM) → consolidate → dashboard
+    weekly   : agentic daily + bridge → agentic_reflector (with rule fallback)
+    full     : observer → consolidate → dashboard → bridge → agentic_reflector
 
 Usage:
     python automation_runner.py daily [--dry-run]
@@ -93,7 +93,18 @@ def stage_reflector(date_str: str | None = None, dry_run: bool = False) -> int:
         cmd.append(date_str)
     if dry_run:
         cmd.append("--dry-run")
-    return run(cmd, label="reflector")
+    return run(cmd, label="reflector (rule-based)")
+
+
+def stage_agentic_reflector(date_str: str | None = None, dry_run: bool = False, force: bool = False) -> int:
+    cmd = [PYTHON, str(JOBS_DIR / "agentic_reflector.py")]
+    if date_str:
+        cmd.append(date_str)
+    if dry_run:
+        cmd.append("--dry-run")
+    if force:
+        cmd.append("--force")
+    return run(cmd, label="agentic_reflector (LLM)")
 
 
 # ── Orchestration ──────────────────────────────────────────────────────────
@@ -131,25 +142,30 @@ def run_agentic(date_str: str | None = None, dry_run: bool = False, force: bool 
     return max(codes) if failures else 0
 
 
-def run_weekly(date_str: str | None = None, dry_run: bool = False) -> int:
-    """Weekly pipeline: daily + bridge + reflector."""
+def run_weekly(date_str: str | None = None, dry_run: bool = False, force: bool = False) -> int:
+    """Weekly pipeline: agentic daily + bridge + agentic_reflector (with rule fallback)."""
     print("=" * 60)
     print(f"[*] Weekly Pipeline — week ending {date_str or datetime.now().strftime('%Y-%m-%d')}")
     print("=" * 60)
 
     codes = []
-    codes.append(run_daily(date_str, dry_run))
+    codes.append(run_agentic(date_str, dry_run, force))
     codes.append(stage_bridge())
-    codes.append(stage_reflector(date_str, dry_run))
+    # Try agentic reflector first; fallback to rule-based if it fails
+    agentic_rc = stage_agentic_reflector(date_str, dry_run, force)
+    if agentic_rc != 0:
+        print("[!] Agentic reflector failed, falling back to rule-based reflector...")
+        agentic_rc = stage_reflector(date_str, dry_run)
+    codes.append(agentic_rc)
 
     failures = [c for c in codes if c != 0]
     print(f"\n[*] Weekly pipeline complete. {len(failures)} stage(s) failed.")
     return max(codes) if failures else 0
 
 
-def run_full(date_str: str | None = None, dry_run: bool = False) -> int:
+def run_full(date_str: str | None = None, dry_run: bool = False, force: bool = False) -> int:
     """Full pipeline: all stages."""
-    return run_weekly(date_str, dry_run)
+    return run_weekly(date_str, dry_run, force)
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────
@@ -168,9 +184,9 @@ def main() -> int:
     elif args.mode == "agentic":
         return run_agentic(args.date, args.dry_run, args.force)
     elif args.mode == "weekly":
-        return run_weekly(args.date, args.dry_run)
+        return run_weekly(args.date, args.dry_run, args.force)
     else:
-        return run_full(args.date, args.dry_run)
+        return run_full(args.date, args.dry_run, args.force)
 
 
 if __name__ == "__main__":
