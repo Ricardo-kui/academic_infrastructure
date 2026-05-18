@@ -87,6 +87,15 @@ def stage_bridge() -> int:
     return run(cmd, label="bridge")
 
 
+def stage_git_maintenance() -> int:
+    """Run git gc to compact objects and reclaim space. Safe: --auto only runs when needed."""
+    if not (INFRA_DIR / ".git").exists():
+        print("[*] No git repo, skipping git maintenance.")
+        return 0
+    cmd = ["git", "gc", "--auto", "--prune=30.days.ago"]
+    return run(cmd, cwd=INFRA_DIR, label="git maintenance")
+
+
 def stage_reflector(date_str: str | None = None, dry_run: bool = False) -> int:
     cmd = [PYTHON, str(JOBS_DIR / "reflector.py")]
     if date_str:
