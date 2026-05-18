@@ -166,6 +166,8 @@ def run_weekly(date_str: str | None = None, dry_run: bool = False, force: bool =
         print("[!] Agentic reflector failed, falling back to rule-based reflector...")
         agentic_rc = stage_reflector(date_str, dry_run)
     codes.append(agentic_rc)
+    # Periodic git maintenance
+    codes.append(stage_git_maintenance())
 
     failures = [c for c in codes if c != 0]
     print(f"\n[*] Weekly pipeline complete. {len(failures)} stage(s) failed.")
