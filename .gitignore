@@ -1,0 +1,31 @@
+# ── Secrets ────────────────────────────────────────────────────────────────
+.env
+.env.local
+*.key
+*.pem
+
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+
+# ── Generated / Runtime Data ───────────────────────────────────────────────
+contexts/memory/daily_raw/
+contexts/memory/latest_dashboard.md
+contexts/memory/latest_bridge.md
+contexts/thought_review/
+contexts/daily_records/
+contexts/survey_sessions/
+
+# ── OS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
