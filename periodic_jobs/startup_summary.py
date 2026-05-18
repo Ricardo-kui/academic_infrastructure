@@ -22,6 +22,7 @@ from pathlib import Path
 INFRA_DIR = Path(os.environ.get("CLAUDE_ACADEMIC_INFRA", "C:/Users/admin/.claude/academic_infrastructure"))
 DASHBOARD_PATH = INFRA_DIR / "contexts" / "memory" / "latest_dashboard.md"
 BRIDGE_PATH = INFRA_DIR / "contexts" / "memory" / "latest_bridge.md"
+PROMOTIONS_DIR = INFRA_DIR / "contexts" / "thought_review" / "promotions"
 
 # ---------------------------------------------------------------------------
 # Helpers
