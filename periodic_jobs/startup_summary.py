@@ -94,6 +94,22 @@ def main() -> int:
         else:
             print("\n  [Bridges] No bridge report found. Run: python tools/bridge_detector.py")
 
+        # --- Pending Promotions -----------------------------------------------
+        pending = find_pending_promotions(PROMOTIONS_DIR)
+        if pending:
+            count = len(pending)
+            print(f"\n  [!] {count} PENDING PROMOTION DRAFT(S) — review required:")
+            for f in pending:
+                # Read first heading for a one-line summary
+                try:
+                    for line in f.read_text(encoding="utf-8").splitlines():
+                        if line.startswith("# Promotion Draft"):
+                            print(f"      → {f.name}: {line.strip('# ')}")
+                            break
+                except Exception:
+                    print(f"      → {f.name}")
+            print(f"  [!] Action: review drafts, then move to applied/ or rejected/")
+
         print(f"\n{'='*50}\n")
         return 0
 
