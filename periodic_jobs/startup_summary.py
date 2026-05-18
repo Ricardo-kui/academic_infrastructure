@@ -37,6 +37,16 @@ def read_head(path: Path, lines: int = 15) -> list[str]:
         return []
 
 
+def find_pending_promotions(promo_dir: Path) -> list[Path]:
+    """Return promotion drafts that haven't been reviewed (not in applied/ or rejected/)."""
+    if not promo_dir.exists():
+        return []
+    pending = []
+    for f in promo_dir.glob("*.md"):
+        pending.append(f)
+    return sorted(pending)
+
+
 def print_error(msg: str) -> None:
     """Send diagnostics to stderr so stdout stays clean for the summary."""
     print(f"[startup_summary] {msg}", file=sys.stderr)
