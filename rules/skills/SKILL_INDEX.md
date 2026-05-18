@@ -45,6 +45,7 @@ status: active
 
 | Skill | 触发场景 | 输出 |
 |-------|---------|------|
+| `s01-recall-data-infrastructure` | 产品召回项目数据基础设施搭建 | 清洗后 recall timing 数据集 + 可复用代码 |
 | `stata-regression` | 跑回归、输出表格 | Stata代码 + 结果表格 |
 | `stata-data-cleaning` | 数据清洗、变量构建 | 可复现的do文件 |
 | `stata` | Stata语法、调试、高级功能 | 代码示例 + 解释 |
