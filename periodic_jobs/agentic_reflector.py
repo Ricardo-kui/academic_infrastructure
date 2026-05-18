@@ -509,8 +509,64 @@ def run_agentic_reflection(end_date: str, dry_run: bool = False, force: bool = F
     else:
         print("[*] No promotion drafts generated.")
 
+    # Auto-commit and push to GitHub (async, non-blocking)
+    _git_auto_sync(end_date, [reflection_path] + [PROMOTIONS_DIR])
+
     print("[*] Done.")
     return 0
+
+
+def _git_auto_sync(end_date: str, paths: list[Path]) -> None:
+    """Commit and push reflector outputs to GitHub. Non-blocking, best-effort."""
+    import subprocess
+
+    repo = INFRA_DIR
+    if not (repo / ".git").exists():
+        print("[*] No git repo found, skipping auto-sync.")
+        return
+
+    try:
+        # Stage specific paths
+        for p in paths:
+            if p.exists():
+                subprocess.run(
+                    ["git", "add", str(p.relative_to(repo))],
+                    cwd=str(repo),
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                )
+        # Check if there's anything to commit
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=str(repo),
+            timeout=15,
+        )
+        if result.returncode == 0:
+            print("[*] No changes to commit for auto-sync.")
+            return
+
+        # Commit
+        msg = f"🤖 auto: weekly reflection {end_date} [agentic-reflector]"
+        subprocess.run(
+            ["git", "commit", "-m", msg],
+            cwd=str(repo),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        print(f"[git] Committed: {msg}")
+
+        # Push (async via background process so it doesn't block)
+        subprocess.Popen(
+            ["git", "push", "origin", "master"],
+            cwd=str(repo),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        print("[git] Push initiated (background).")
+    except Exception as e:
+        print(f"[!] Auto-sync failed (non-fatal): {e}")
 
 
 def main() -> int:
