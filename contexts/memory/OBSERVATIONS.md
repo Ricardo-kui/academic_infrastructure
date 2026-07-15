@@ -43,6 +43,69 @@ status: active
 ## Daily Observations
 
 <!-- observer.py / Claude cron 在此追加 -->
+### Date: 2026-06-02
+
+🟡 **方法决策 / 写作判断**
+- [#产品召回] Introduction Packet 修正文献定位，明确Darby和Wowak为锚文 (文献定位修正影响Gap表述和理论贡献声明，属于写作关键修改) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\Introduction Packet - CEO regulatory focus × time to recall.md]]
+
+🟢 **常规进展 / 阅读记录**
+- [#产品召回] 全局概念页更新，新增Paruchuri et al.和Ahmadi et al.文献连接 (新增核心文献连接，拓展理论接口，属于文献综述实质性推进) [[概念库\01 概念\全局概念 - CEO调节定向.md]]
+
+### Date: 2026-05-29
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] CEO regulatory focus × time to recall 项目完成初稿 (项目里程碑：完成初稿，进入投稿准备阶段) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Manuscript - CEO regulatory focus × time to recall.md]]
+
+### Date: 2026-05-26
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] CEO regulatory focus × recall 论文初稿完成 (项目里程碑：基准回归跑通，初稿完成) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Manuscript - CEO regulatory focus × time to recall.md]]
+- [#方法论] 叙述模板训练集新增三篇论文的精细理论/引言分析 (方法论训练集实质性推进，识别新理论架构类型) [[00 工作台\叙述模板训练集\narrative_analysis\theory\mvp30\fine_grained\batch_2026-05-26\han_pollock_paruchuri_smj_distilled_theory.md]]
+
+🟢 **常规进展 / 阅读记录**
+- [#跨专题] 知识库操作日志记录运维与文献回流 (常规运维与文献回流，无新研究判断) [[00 工作台\知识库操作日志.md]]
+
+### Date: 2026-05-27
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] 放弃omission/commission映射，改用新术语体系 (核心理论映射被推翻，术语体系变更，影响H1/H2方向) [[00 工作台\项目\CEO regulatory focus × time to recall\深度阅读笔记 - Crowe & Higgins (1997) regulatory focus 战略倾向.md]]
+
+### Date: 2026-05-18
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] 项目锁定 count-primary / timing-conditional 结果架构 (核心结果架构从并列改为优先级顺序，是项目里程碑) [[00 工作台\项目\anti-SLAPP laws × product recall count and timing\00 Active\文献证据包 - anti-SLAPP laws × product recall count and timing.md]]
+- [#产品召回] 机制口径锁定：ability/external revelation 为主线，incentive 为副线 (理论机制从双路径并列改为有主次的框架) [[00 工作台\项目\anti-SLAPP laws × product recall count and timing\90 AI drafts\机制编译笔记 - anti-SLAPP 如何影响召回数量与时机.md]]
+
+### Date: 2026-05-19
+
+🔴 **理论突破 / 重大决策**
+- [#共同所有权] 共同所有权理论链收口：条件化框架取代单向主效应 (理论主张从平均效应转向威胁强度条件化，是核心理论框架的实质性推进) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Theory Evidence Chain - 共同所有权 × 产品召回.md]]
+
+### Date: 2026-05-20
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] 确定paranoia项目叙事骨架：contingency而非主效应 (明确项目核心叙事为severity×paranoia交互，非主效应，属理论框架重大修正) [[00 工作台\项目\CEO paranoia × time to recall\00 Active\文献证据包 - CEO paranoia × time to recall.md]]
+
+### Date: 2026-05-22
+
+🔴 **理论突破 / 重大决策**
+- [#共同所有权] Context Packet更新：理论框架明确为条件化框架，核心是action-threshold reweighting (理论框架从单向效应转向条件化框架是重大修正) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Context Packet - 共同所有权 × 产品召回.md]]
+
+### Date: 2026-05-23
+
+🟡 **方法决策 / 写作判断**
+- [#方法论] Slot-aligned verification demo展示真空输出与注入事实的精度差异，暴露Darby2023设计细节 (方法验证：揭示模板幻觉风险，明确需处理recurrent-event和GLM) [[00 工作台/项目/CEO regulatory focus × time to recall/EN/90 AI drafts/EN/slot_aligned_verification.md]]
+
+### Date: 2026-05-24
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] Literature Dialogue 补全完成，进入 full manuscript consistency pass (项目里程碑：文献对话补全后进入手稿一致性检查阶段) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\项目作战室 - CEO regulatory focus × time to recall.md]]
+
+### Date: 2026-05-25
+
+🟢 **常规进展 / 阅读记录**
+- [#产品召回] 发现一篇JOM 2026论文，将机构所有权与产品召回速度关联，提供引言写作范本 (新锚文献，直接关联产品召回与治理理论，提供可复用的引言结构) [[00 工作台\叙述模板训练集\narrative_analysis\mvp30\darby2026_large_institutional_ownership_recall_distill-introduction-exemplar.md]]
+
 ### Date: 2026-05-17
 
 🟢 **常规进展 / 阅读记录**
