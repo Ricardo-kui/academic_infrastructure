@@ -76,6 +76,8 @@ status: active
 | Skill | 触发场景 | 输出 | Claude | Codex |
 |---|---|---|---|---|
 | `s01-recall-data-infrastructure` | 产品召回项目数据基础设施搭建 | recall timing 数据骨架 + 变量定义 | yes | yes |
+| `empirical-pipeline-stata` | 设计已定后在 Stata 跑完整实证流水线(现代交错 DiD + 稳健性箱 + 机制/中介 + 召回时机生存模型) | 投稿级表图 + 完整稳健性附录 | yes | bridge |
+| `xianzhu-skill` | 既定问题下试规格/口径/变换到稳健或显著(纪律版:先归因再变换) | 推荐规格 + 完整实验日志 | yes | bridge |
 | `stata-regression` | 跑回归、输出表格 | Stata 代码 + 结果表格 | yes | bridge |
 | `stata-data-cleaning` | 数据清洗、变量构建 | 可复现 do-file | yes | bridge |
 | `stata` | Stata 语法、调试、高级功能 | 代码示例 + 解释 | yes | bridge |
