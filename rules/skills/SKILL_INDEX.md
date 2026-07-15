@@ -107,6 +107,8 @@ status: active
 | `proofread` | 语法、风格、清晰度校对 | 修改建议 | yes | bridge |
 | `empirical-writeup` | 分析输出转为期刊 prose | Methods/Results/图表文字 | yes | yes |
 | `paper-writing-stack` | 不知道先改哪个 section | 修改顺序建议 + bottleneck 诊断 | yes | yes |
+| `revision-coach` | 收到审稿意见/R&R:解析→修改路线图→回复信骨架;或对已有回复逐条体检 | Revision Roadmap + Response Letter 骨架 / 回复体检报告 | yes | bridge |
+| `ai-disclosure` | 投稿前生成期刊 AI 使用声明(AOM/ASQ/SMJ/OrgSci) | 按期刊政策的声明段落 + 摆放位置 | yes | bridge |
 
 ### 6. 范文蒸馏
 
