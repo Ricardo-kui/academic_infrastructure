@@ -15,7 +15,7 @@ status: active
 - 文件与知识库路由见 `rules/ACADEMIC_WORKSPACE.md`
 - 默认表达风格见 `rules/ACADEMIC_COMMUNICATION.md`
 - 具体研究决策原则见 `rules/axioms/INDEX.md`
-- 具体工作流见 `rules/skills/SKILL_INDEX.md`
+- 具体工作流：见 `AGENTS.md` Skill Dispatch 表（已作为项目上下文加载）
 
 ## 核心身份
 
