@@ -32,13 +32,10 @@ project context in every session.
 
 ## Escalation To Full Rules
 
-Read the full rule files only when the task requires deep academic judgment,
-long-form academic writing, project-specific workspace routing, or the bootstrap
-is insufficient:
+SOUL and WORKSPACE are auto-injected into every session via `@` in the project
+CLAUDE.md. For deeper guidance beyond the baseline and those two files, read:
 
-1. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_SOUL.md`
-2. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_WORKSPACE.md`
-3. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_COMMUNICATION.md`
-
-Consult the axioms index only when the current academic task needs principled
-decision guidance beyond what the loaded AGENTS.md provides.
+- `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_COMMUNICATION.md`
+  — Chinese academic prose style (only when writing/editing Chinese text)
+- `C:\Users\admin\.claude\academic_infrastructure\rules\axioms\INDEX.md`
+  — principled decision guidance for theoretical, empirical, or writing dilemmas
