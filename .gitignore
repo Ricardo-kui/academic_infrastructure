@@ -14,6 +14,7 @@ venv/
 
 # ── Generated / Runtime Data ───────────────────────────────────────────────
 contexts/memory/daily_raw/
+tools/semantic_search/indexes/
 contexts/memory/latest_dashboard.md
 contexts/memory/latest_bridge.md
 contexts/thought_review/
