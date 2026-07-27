@@ -28,7 +28,7 @@ status: active
 | 用户长期画像 | `rules/ACADEMIC_USER.md` |
 | 沟通与默认 prose 风格 | `rules/ACADEMIC_COMMUNICATION.md` |
 | 学术公理索引 | `rules/axioms/INDEX.md` |
-| 学术技能索引 | `rules/skills/SKILL_INDEX.md` |
+| 学术技能路由 | `AGENTS.md` Skill Dispatch 表（项目上下文） |
 | 动态观察记忆 | `contexts/memory/OBSERVATIONS.md` |
 | 记忆系统说明 | `contexts/memory/KNOWLEDGE_BASE.md` |
 | 周期反思 | `contexts/thought_review/` |
@@ -80,9 +80,9 @@ status: active
 | 查理论构念定义 | Vault `index.md` → `概念库\` |
 | 查变量测量 | 概念页 → 原子化笔记 → PDF evidence extracts |
 | 找用户过往判断 | `contexts/memory/OBSERVATIONS.md` → Vault 问答归档/项目作战室 |
-| 做文献检索或引用 | `rules/skills/SKILL_INDEX.md` → 文献/引用相关 skill |
+| 做文献检索或引用 | `AGENTS.md` Skill Dispatch → 文献/引用相关 skill |
 | 设计识别策略 | `rules/axioms/INDEX.md` 的 e* 公理 → causal/DID/stata 相关 skill |
-| 写或审论文 section | `rules/skills/SKILL_INDEX.md` → write/review/pollock 相关 skill |
+| 写或审论文 section | `AGENTS.md` Skill Dispatch → write/review/pollock 相关 skill |
 | 跨专题找连接 | `tools/bridge_detector.py` → 对应专题入口 |
 
 ## 命名规则
