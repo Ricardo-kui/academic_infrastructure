@@ -37,9 +37,8 @@ long-form academic writing, project-specific workspace routing, or the bootstrap
 is insufficient:
 
 1. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_SOUL.md`
-2. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_USER.md`
-3. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_WORKSPACE.md`
-4. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_COMMUNICATION.md`
+2. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_WORKSPACE.md`
+3. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_COMMUNICATION.md`
 
 Consult the axioms index only when the current academic task needs principled
 decision guidance beyond what the loaded AGENTS.md provides.
