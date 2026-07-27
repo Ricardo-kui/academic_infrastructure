@@ -41,5 +41,5 @@ is insufficient:
 3. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_WORKSPACE.md`
 4. `C:\Users\admin\.claude\academic_infrastructure\rules\ACADEMIC_COMMUNICATION.md`
 
-Consult the full skill index or axioms index only when the current academic task
-needs that routing.
+Consult the axioms index only when the current academic task needs principled
+decision guidance beyond what the loaded AGENTS.md provides.
