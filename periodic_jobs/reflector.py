@@ -19,12 +19,31 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from consolidate_observations import cleanup_observations_content
+
 # ── Configuration ──────────────────────────────────────────────────────────
 
 INFRA_DIR = Path("C:/Users/admin/.claude/academic_infrastructure")
 OBSERVATIONS_PATH = INFRA_DIR / "contexts" / "memory" / "OBSERVATIONS.md"
 REFLECTION_DIR = INFRA_DIR / "contexts" / "thought_review"
 AXIOMS_DIR = INFRA_DIR / "rules" / "axioms"
+
+
+def _configure_utf8_stdio() -> None:
+    """Avoid Windows GBK console failures when printing Chinese or emoji."""
+    if os.name != "nt":
+        return
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
+
+
+_configure_utf8_stdio()
 
 # Promotion thresholds
 PROMOTION_RULES = {
@@ -272,7 +291,7 @@ def generate_reflection_report(
             if promo["type"] == "axiom_candidate":
                 lines.append("- **Action**: Consider formalizing into `rules/axioms/` if verified again next week.")
             elif promo["type"] == "skill_suggestion":
-                lines.append("- **Action**: Consider adding to `rules/skills/SKILL_INDEX.md` or creating a reusable template.")
+                lines.append("- **Action**: Consider creating/updating a native skill under `.claude/skills/<name>/SKILL.md`, then update `rules/skills/SKILL_INDEX.md` as the bridge index.")
             lines.append("")
     else:
         lines.append("- No promotion suggestions this week.")
@@ -299,22 +318,8 @@ def generate_reflection_report(
 
 def gc_observations(content: str, entries: list[dict]) -> str:
     """Perform garbage collection on OBSERVATIONS.md."""
-    # For MVP, this is a simple mark-and-report
-    # Full GC requires tracking which entries have been promoted
-    now = datetime.now()
-    lines = content.splitlines()
-    result_lines = []
-    removed_count = 0
-
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith("🟢"):
-            # Check if we can find a date for this line
-            # Simple heuristic: keep all 🟢 for now, report would-be GC
-            pass
-        result_lines.append(line)
-
-    return "\n".join(result_lines)
+    cleaned, _stats = cleanup_observations_content(content)
+    return cleaned
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────
@@ -361,9 +366,12 @@ def main():
     report = generate_reflection_report(week_entries, patterns, promotions, end_date)
 
     if args.dry_run:
+        cleaned, cleanup_stats = cleanup_observations_content(content)
         print("\n--- Preview ---")
         print(report[:2000])
         print("... (truncated)")
+        print("\n--- Cleanup Preview ---")
+        print(cleanup_stats)
         return
 
     # Write reflection
@@ -377,8 +385,13 @@ def main():
     reflection_path.write_text(report, encoding="utf-8")
     print(f"[write] {reflection_path}")
 
-    # GC observations (MVP: report only)
-    print(f"[*] GC: Currently in report-only mode. Run with --apply-gc to remove promoted entries.")
+    # GC observations under hard retention rules.
+    cleaned_content = gc_observations(content, all_entries)
+    if cleaned_content != content:
+        OBSERVATIONS_PATH.write_text(cleaned_content, encoding="utf-8")
+        print("[gc] Applied hard retention rules to OBSERVATIONS.md")
+    else:
+        print("[gc] No OBSERVATIONS.md cleanup needed.")
 
     print(f"[*] Done.")
 

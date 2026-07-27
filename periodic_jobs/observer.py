@@ -32,6 +32,10 @@ SCAN_TARGETS = [
     (VAULT_ROOT / "daily", "daily_log"),
     (VAULT_ROOT / "meeting_notes", "meeting"),
     (VAULT_ROOT / "00 工作台/项目", "project"),
+    (VAULT_ROOT / "00 工作台/叙述模板训练集", "narrative_training"),
+    (VAULT_ROOT / "文献笔记库/02 原子化", "atomic_notes"),
+    (VAULT_ROOT / "概念库", "concepts"),
+    (VAULT_ROOT / "论证卡库", "argument_cards"),
 ]
 
 # Files to check for modifications
@@ -214,6 +218,10 @@ def write_raw_yaml(observations: dict, force: bool = False) -> Path | None:
     """Write observations to daily_raw/YYYY-MM-DD.yaml."""
     date_str = observations["date"]
     raw_path = RAW_DIR / f"{date_str}.yaml"
+
+    if not observations.get("activities"):
+        print("[skip] No activities with recording value; raw file not written.")
+        return None
 
     if raw_path.exists() and not force:
         print(f"[skip] Raw file already exists: {raw_path}")

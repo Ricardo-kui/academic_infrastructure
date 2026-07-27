@@ -15,6 +15,17 @@ L1/L2（动态记忆）: contexts/memory/OBSERVATIONS.md  → agent 主动检索
 L0（原始数据）: contexts/memory/daily_raw/  → observer.py 采集的原始 YAML
 ```
 
+## 硬性保留规则
+
+`OBSERVATIONS.md` 是最近工作记忆，不是永久历史数据库。永久资产应进入 weekly reflection、项目 Context Packet、公理、skill 或 Vault 结构化笔记。
+
+- 空日期不写入 `OBSERVATIONS.md`；没有可记录观察时不写 raw YAML。
+- 重复观察按 `path + summary` 指纹去重，保留最新的一条。
+- 🔴 理论突破、重大方法或项目决策：保留，直到明确晋升、废弃或人工删除。
+- 🟡 方法判断、写作判断：保留 90 天；未被复用或晋升则从 `OBSERVATIONS.md` 清理。
+- 🟢 常规进展、日常阅读：保留 30 天；主要进入 weekly summary，不长期留在 `OBSERVATIONS.md`。
+- `daily_raw/` 是短期运行缓存，不进入长期 prompt；`OBSERVATIONS.md` 只保留近期可行动记忆。
+
 ## Observer 操作手册
 
 ### 目的

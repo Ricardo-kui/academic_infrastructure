@@ -3,7 +3,7 @@
 agentic_observer.py — LLM-powered Agentic Observer for academic infrastructure.
 
 Scans daily file changes, sends content to an LLM (DeepSeek/Kimi/OpenRouter)
-for semantic analysis, receives structured 🔴🟡🟢 observations,
+for semantic analysis, receives structured [HIGH][MED][LOW] observations,
 and writes to daily_raw/.
 
 Usage:
@@ -42,9 +42,9 @@ MAX_TOTAL_CHARS = MAX_TOTAL_TOKENS * APPROX_CHARS_PER_TOKEN
 
 # Priority mapping from Kimi output
 PRIORITY_MAP = {
-    "high": "🔴",
-    "medium": "🟡",
-    "low": "🟢",
+    "high": "[HIGH]",
+    "medium": "[MED]",
+    "low": "[LOW]",
 }
 
 # ── Prompt Template ────────────────────────────────────────────────────────
@@ -53,19 +53,19 @@ OBSERVER_SYSTEM_PROMPT = """你是一个学术研究项目的"日常观察员"�
 
 ## 你的判断标准
 
-🔴 **高优先级 (high)** — 满足任一：
+[HIGH] **高优先级 (high)** — 满足任一：
 - 理论框架的重大修正或突破
 - 识别策略（IV/DiD/RDD等）的确定或变更
 - 项目里程碑（数据匹配完成、基准回归跑通、投稿决定等）
 - 核心假设的验证或推翻
 
-🟡 **中优先级 (medium)** — 满足任一：
+[MED] **中优先级 (medium)** — 满足任一：
 - 变量测量方案的确定
 - 稳健性检验的设计或结果
 - 文献综述的实质性推进（新锚文、新gap定位）
 - 写作段落的关键修改
 
-🟢 **低优先级 (low)** — 常规进展：
+[LOW] **低优先级 (low)** — 常规进展：
 - 日常文献阅读
 - 笔记整理、格式调整
 - 数据清洗的常规步骤
@@ -90,6 +90,9 @@ OBSERVER_SYSTEM_PROMPT = """你是一个学术研究项目的"日常观察员"�
 
 ## 约束
 - 仅对**确实有学术价值**的变动生成观察，无价值的返回空数组
+- 不记录"文件被修改"本身；只有理论判断、方法口径、变量定义、项目方向、写作承诺或重要文献定位变化才记录
+- 常规整理、格式调整、无实质判断的日常阅读应返回空数组，除非它形成了后续研究判断
+- 同一项目/同一判断合并成一条 observation，避免重复记录
 - project_tag 从以下选择：#产品召回, #共同所有权, #竞业协议, #方法论, #写作, #理论, #审稿, #跨专题
 - 每条 observation 的 reasoning 不超过 30 字
 - 尽量合并同一项目下的多个文件变动为一条观察"""
@@ -223,7 +226,7 @@ def observations_to_yaml_struct(observations: list[dict], date_str: str) -> dict
     activities = []
     for obs in observations:
         priority = obs.get("priority", "low")
-        marker = PRIORITY_MAP.get(priority, "🟢")
+        marker = PRIORITY_MAP.get(priority, "[LOW]")
         act_type = obs.get("type", "routine")
         tag = obs.get("project_tag", "#general")
         summary = obs.get("summary", "[no summary]")
@@ -260,7 +263,7 @@ def observations_to_yaml_struct(observations: list[dict], date_str: str) -> dict
 # ── Core Logic ─────────────────────────────────────────────────────────────
 
 
-def run_agentic_observations(target_date: datetime, dry_run: bool = False, force: bool = False) -> dict | None:
+def run_agentic_observations(target_date: datetime, dry_run: bool = False, force: bool = False) -> dict | None | bool:
     """Run the full agentic observation pipeline."""
     date_str = target_date.strftime("%Y-%m-%d")
     raw_path = RAW_DIR / f"{date_str}.yaml"
@@ -301,7 +304,7 @@ def run_agentic_observations(target_date: datetime, dry_run: bool = False, force
     except Exception as e:
         print(f"[!] LLM API call failed: {e}")
         print("[!] Consider running rule-based observer as fallback.")
-        return None
+        return False
 
     if hasattr(response, "content"):
         response_text = response.content
@@ -321,8 +324,12 @@ def run_agentic_observations(target_date: datetime, dry_run: bool = False, force
     observations = parse_kimi_observations(response_text)
     print(f"[*] Parsed {len(observations)} observations")
 
+    if not observations:
+        print("[skip] No observations with recording value; raw file not written.")
+        return None
+
     for obs in observations:
-        marker = PRIORITY_MAP.get(obs.get("priority", "low"), "🟢")
+        marker = PRIORITY_MAP.get(obs.get("priority", "low"), "[LOW]")
         print(f"  {marker} [{obs.get('project_tag', '#general')}] {obs.get('summary', '')}")
 
     # 5. Convert to standard struct
@@ -364,6 +371,8 @@ def main() -> int:
     print(f"[*] Provider: {provider} (model: {os.environ.get('LLM_MODEL', 'default')})")
 
     result = run_agentic_observations(target_date, dry_run=args.dry_run, force=args.force)
+    if result is False:
+        return 1
     if result is None and not args.dry_run:
         print("[*] No observations generated.")
     return 0

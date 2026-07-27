@@ -3,7 +3,7 @@
 academic_cli.py — Unified CLI for academic infrastructure tools.
 
 Commands:
-    observe [date]     Run daily research activity observer
+    observe [date]     Run agentic daily observer with rule-based fallback
     reflect [date]     Run weekly reflection
     search QUERY       Semantic search across Vault
     index PROFILE      Build semantic index for a profile
@@ -21,15 +21,23 @@ SEMANTIC_DIR = INFRA_DIR / "tools" / "semantic_search"
 JOBS_DIR = INFRA_DIR / "periodic_jobs"
 
 
-def cmd_observe(args: argparse.Namespace) -> int:
-    cmd = [sys.executable, str(JOBS_DIR / "observer.py")]
+def _observer_cmd(script_name: str, args: argparse.Namespace) -> list[str]:
+    cmd = [sys.executable, str(JOBS_DIR / script_name)]
     if args.date:
         cmd.append(args.date)
     if args.dry_run:
         cmd.append("--dry-run")
     if args.force:
         cmd.append("--force")
-    return subprocess.call(cmd)
+    return cmd
+
+
+def cmd_observe(args: argparse.Namespace) -> int:
+    rc = subprocess.call(_observer_cmd("agentic_observer.py", args))
+    if rc == 0:
+        return 0
+    print("[!] Agentic observer failed, falling back to rule-based observer...")
+    return subprocess.call(_observer_cmd("observer.py", args))
 
 
 def cmd_reflect(args: argparse.Namespace) -> int:
@@ -91,7 +99,7 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     # observe
-    obs = sub.add_parser("observe", help="Run daily observer")
+    obs = sub.add_parser("observe", help="Run agentic daily observer with rule-based fallback")
     obs.add_argument("date", nargs="?", help="Target date (YYYY-MM-DD)")
     obs.add_argument("--dry-run", action="store_true")
     obs.add_argument("--force", action="store_true")

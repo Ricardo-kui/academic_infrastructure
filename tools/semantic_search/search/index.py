@@ -55,7 +55,8 @@ class ForwardIndex:
         """Atomic save: write to temp then rename."""
         # Save embeddings
         tmp_emb = self.embeddings_path.with_suffix(".npy.tmp")
-        np.save(str(tmp_emb), self._embeddings)
+        with open(tmp_emb, "wb") as f:
+            np.save(f, self._embeddings)
         tmp_emb.replace(self.embeddings_path)
 
         # Save chunks

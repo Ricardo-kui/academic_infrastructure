@@ -196,7 +196,7 @@ def main() -> int:
     print(f"    Provider: {client.provider_name}")
     print(f"    Model: {client.model}")
     print(f"    Base URL: {client.base_url}")
-    print(f"    Pricing: input ¥{client.pricing['input']}/M, output ¥{client.pricing['output']}/M")
+    print(f"    Pricing: input CNY {client.pricing['input']}/M, output CNY {client.pricing['output']}/M")
     print(f"    Example cost (100K in + 20K out): {cost_str:.4f} {currency}")
 
     try:

@@ -7,7 +7,7 @@ sends to LLM for semantic analysis, receives structured promotion suggestions
 and GC plans, writes weekly reflection report.
 
 Promotions are written as DRAFTS to contexts/thought_review/promotions/,
-requiring human confirmation before moving to rules/.
+requiring human confirmation before applying to rules/ or native skill roots.
 
 Usage:
     python agentic_reflector.py [YYYY-MM-DD] [--dry-run] [--force]
@@ -18,12 +18,12 @@ Fallback: If LLM API fails, falls back to rule-based reflector.py.
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from consolidate_observations import cleanup_observations_content
 from llm_client import LLMClient
 
 # ── Configuration ──────────────────────────────────────────────────────────
@@ -34,7 +34,9 @@ REFLECTION_DIR = INFRA_DIR / "contexts" / "thought_review"
 PROMOTIONS_DIR = REFLECTION_DIR / "promotions"
 RULES_DIR = INFRA_DIR / "rules"
 AXIOMS_DIR = RULES_DIR / "axioms"
-SKILLS_DIR = RULES_DIR / "skills"
+SKILL_INDEX_PATH = RULES_DIR / "skills" / "SKILL_INDEX.md"
+CLAUDE_SKILLS_ROOT = Path("C:/Users/admin/.claude/skills")
+CODEX_SKILLS_ROOT = Path("C:/Users/admin/.codex/skills")
 
 MAX_OBS_CHARS = 80_000  # ~40K tokens budget for observations
 
@@ -47,7 +49,9 @@ REFLECTOR_SYSTEM_PROMPT = """你是一个学术研究基础设施的"记忆反�
 | 目标文件 | 内容类型 | 示例 |
 |---------|---------|------|
 | `rules/axioms/` | 可执行的决策原则 | "识别策略可信度优先于系数显著性" |
-| `rules/skills/` | 技术方法论/工作流模板 | "DiD 稳健性检验清单" |
+| `C:\\Users\\admin\\.claude\\skills\\<skill-name>\\SKILL.md` | 原生 skill 实体 | "DiD 稳健性检验清单" |
+| `C:\\Users\\admin\\.codex\\skills\\<skill-name>\\SKILL.md` | 高频或需 Codex 自动触发的 skill 同步副本 | "Stata 回归流水线" |
+| `rules/skills/SKILL_INDEX.md` | skill 路由索引与 Claude/Codex 安装状态 | 只新增/更新索引行，不存完整 SOP |
 | `rules/ACADEMIC_USER.md` | 用户画像更新 | 新增研究偏好、目标期刊变化 |
 | `rules/ACADEMIC_COMMUNICATION.md` | 沟通风格调整 | 新增修辞禁忌、输出偏好 |
 | `rules/ACADEMIC_SOUL.md` | Agent 核心价值观 | 极少数根本性身份调整 |
@@ -64,6 +68,9 @@ REFLECTOR_SYSTEM_PROMPT = """你是一个学术研究基础设施的"记忆反�
 1. 同一类技术任务反复出现 3+ 次
 2. 形成可复用的步骤序列或检查清单
 3. 有明确的输入-输出定义
+4. target_file 必须是 Claude 原生 skill 目标：`C:\\Users\\admin\\.claude\\skills\\<kebab-skill-name>\\SKILL.md`
+5. 如果该 skill 高频、跨 runtime 使用、或需要 Codex 自动触发，设置 `"codex_sync": true`；否则设置 false
+6. 不要把完整 skill SOP 写入 `rules/skills/*.md`。`rules/skills` 只更新 `SKILL_INDEX.md` 路由状态
 
 ## 垃圾回收（GC）规则
 
@@ -83,8 +90,11 @@ REFLECTOR_SYSTEM_PROMPT = """你是一个学术研究基础设施的"记忆反�
       "type": "axiom" | "skill" | "user_update" | "communication_update",
       "confidence": "high" | "medium" | "low",
       "target_file": "建议的文件路径",
+      "skill_name": "仅 skill 类型需要；kebab-case",
+      "codex_sync": false,
+      "codex_target_file": "仅 codex_sync=true 时需要",
       "reason": "为什么值得晋升（引用具体观察）",
-      "draft_content": "如果是 axiom：完整 frontmatter + 正文；如果是 user_update：要追加的段落"
+      "draft_content": "如果是 axiom：完整 frontmatter + 正文；如果是 skill：完整 SKILL.md，必须包含 name 和 description frontmatter；如果是 user_update：要追加的段落"
     }
   ],
   "gc_plan": {
@@ -266,6 +276,113 @@ def parse_llm_json(response_text: str) -> dict:
             return {}
 
 
+def normalize_promotion_targets(data: dict) -> dict:
+    """Normalize promotion target paths after LLM output.
+
+    Skill promotions now target native skill roots, not rules/skills/*.md.
+    This keeps older model responses from recreating SOP files under rules/skills.
+    """
+    promotions = data.get("promotions", [])
+    if not isinstance(promotions, list):
+        data["promotions"] = []
+        return data
+
+    for promo in promotions:
+        if not isinstance(promo, dict):
+            continue
+        if promo.get("type") == "skill":
+            _normalize_skill_promotion(promo)
+    return data
+
+
+def _normalize_skill_promotion(promo: dict) -> None:
+    skill_name = _infer_skill_name(promo)
+    promo["skill_name"] = skill_name
+    promo["target_file"] = str(CLAUDE_SKILLS_ROOT / skill_name / "SKILL.md")
+
+    codex_sync = _truthy(promo.get("codex_sync"))
+    if promo.get("codex_sync") is None:
+        codex_sync = _default_codex_sync(promo)
+    promo["codex_sync"] = codex_sync
+    promo["codex_target_file"] = str(CODEX_SKILLS_ROOT / skill_name / "SKILL.md")
+    promo["index_file"] = str(SKILL_INDEX_PATH)
+
+
+def _infer_skill_name(promo: dict) -> str:
+    for key in ("skill_name", "name"):
+        raw = promo.get(key)
+        if raw:
+            slug = _slugify_skill_name(str(raw))
+            if slug:
+                return slug
+
+    target = str(promo.get("target_file", "")).strip()
+    candidate = _candidate_from_target_path(target)
+    if candidate:
+        slug = _slugify_skill_name(candidate)
+        if slug:
+            return slug
+
+    draft = str(promo.get("draft_content", ""))
+    heading = re.search(r"^#\s+(.+)$", draft, re.MULTILINE)
+    if heading:
+        slug = _slugify_skill_name(heading.group(1))
+        if slug:
+            return slug
+
+    return "academic-workflow"
+
+
+def _candidate_from_target_path(target: str) -> str:
+    if not target:
+        return ""
+    normalized = target.replace("\\", "/").strip()
+    parts = [p for p in normalized.split("/") if p]
+    if not parts:
+        return ""
+
+    if parts[-1].lower() == "skill.md" and len(parts) >= 2:
+        return parts[-2]
+
+    filename = parts[-1]
+    return re.sub(r"\.md$", "", filename, flags=re.IGNORECASE)
+
+
+def _slugify_skill_name(value: str) -> str:
+    value = value.strip()
+    value = re.sub(r"\.md$", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"(?i)^skill:\s*", "", value)
+    value = re.sub(r"(?i)^s\d+:\s*", "", value)
+    value = re.sub(r"[^A-Za-z0-9]+", "-", value).strip("-").lower()
+    value = re.sub(r"-+", "-", value)
+    # Historical rules/skills files often used *_setup.md for a native skill
+    # whose public name should not carry the implementation suffix.
+    value = re.sub(r"-(setup|workflow|template)$", "", value)
+    return value
+
+
+def _truthy(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "recommended", "需要", "是"}
+
+
+def _default_codex_sync(promo: dict) -> bool:
+    confidence = str(promo.get("confidence", "")).lower()
+    text = " ".join(
+        str(promo.get(k, ""))
+        for k in ("reason", "draft_content", "target_file")
+    ).lower()
+    sync_keywords = ["codex", "自动触发", "原生", "高频", "频繁", "反复", "cross-runtime"]
+    return confidence == "high" or any(k.lower() in text for k in sync_keywords)
+
+
+def _yaml_quote(value: object) -> str:
+    return json.dumps(str(value), ensure_ascii=False)
+
+
 def generate_report(data: dict, week_entries: list[dict], end_date: str) -> str:
     """Generate the weekly reflection markdown report."""
     start_date = (
@@ -317,6 +434,10 @@ def generate_report(data: dict, week_entries: list[dict], end_date: str) -> str:
             emoji = {"high": "[HI]", "medium": "[MED]", "low": "[LOW]"}.get(conf, "[MED]")
             lines.append(f"### {idx}. [{emoji} {conf.upper()}] {promo.get('type', 'unknown')} → `{promo.get('target_file', 'N/A')}`")
             lines.append("")
+            if promo.get("type") == "skill":
+                lines.append(f"**Skill name**: `{promo.get('skill_name', 'N/A')}`")
+                lines.append(f"**Codex sync**: {'recommended' if promo.get('codex_sync') else 'optional'}")
+                lines.append("")
             lines.append(f"**Reason**: {promo.get('reason', 'N/A')}")
             lines.append("")
             if promo.get("draft_content"):
@@ -354,7 +475,8 @@ def generate_report(data: dict, week_entries: list[dict], end_date: str) -> str:
         "",
         "- [ ] Review promotion drafts in `contexts/thought_review/promotions/`",
         "- [ ] Confirm or reject AI-generated promotion suggestions",
-        "- [ ] Apply approved promotions to `rules/`",
+        "- [ ] Apply approved axioms/user updates to `rules/`",
+        "- [ ] Apply approved skills to native skill roots and update `rules/skills/SKILL_INDEX.md`",
         "- [ ] Run GC on OBSERVATIONS.md (remove entries marked for deletion)",
         "",
     ])
@@ -364,6 +486,7 @@ def generate_report(data: dict, week_entries: list[dict], end_date: str) -> str:
 
 def write_promotion_drafts(promotions: list[dict], end_date: str) -> list[Path]:
     """Write promotion drafts to promotions/ dir for human review."""
+    normalize_promotion_targets({"promotions": promotions})
     PROMOTIONS_DIR.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
 
@@ -376,14 +499,17 @@ def write_promotion_drafts(promotions: list[dict], end_date: str) -> list[Path]:
 
         filename = f"{end_date}_promo_{idx:02d}_{ptype}_{conf}.md"
         path = PROMOTIONS_DIR / filename
+        target_file = promo.get("target_file", "N/A")
+        extra_frontmatter = _promotion_frontmatter_extra(promo)
+        action_items = _promotion_action_items(promo)
 
         content = f"""---
 type: promotion_draft
 status: pending_review
 confidence: {conf}
 promotion_type: {ptype}
-target_file: {promo.get('target_file', 'N/A')}
-generated_at: {datetime.now().isoformat()}
+target_file: {_yaml_quote(target_file)}
+{extra_frontmatter}generated_at: {datetime.now().isoformat()}
 period_end: {end_date}
 ---
 
@@ -399,14 +525,51 @@ period_end: {end_date}
 
 ## Action Required
 
-- [ ] Review draft for accuracy and alignment
-- [ ] If approved: copy/modify into `{promo.get('target_file', 'target file')}`
-- [ ] If rejected: delete this file or move to `contexts/thought_review/rejected/`
+{action_items}
 """
         path.write_text(content, encoding="utf-8")
         written.append(path)
 
     return written
+
+
+def _promotion_frontmatter_extra(promo: dict) -> str:
+    if promo.get("type") != "skill":
+        return ""
+    fields = [
+        ("skill_name", promo.get("skill_name", "")),
+        ("codex_sync_recommended", "yes" if promo.get("codex_sync") else "no"),
+        ("codex_target_file", promo.get("codex_target_file", "")),
+        ("index_file", promo.get("index_file", str(SKILL_INDEX_PATH))),
+    ]
+    return "".join(f"{key}: {_yaml_quote(value)}\n" for key, value in fields if value)
+
+
+def _promotion_action_items(promo: dict) -> str:
+    if promo.get("type") != "skill":
+        target = promo.get("target_file", "target file")
+        return "\n".join([
+            "- [ ] Review draft for accuracy and alignment",
+            f"- [ ] If approved: copy/modify into `{target}`",
+            "- [ ] If rejected: delete this file or move to `contexts/thought_review/rejected/`",
+        ])
+
+    target = promo.get("target_file", "target file")
+    codex_target = promo.get("codex_target_file", "")
+    index_file = promo.get("index_file", str(SKILL_INDEX_PATH))
+    lines = [
+        "- [ ] Review draft for accuracy, scope, and native skill frontmatter (`name`, `description`)",
+        f"- [ ] If approved: create/update Claude native skill at `{target}`",
+    ]
+    if promo.get("codex_sync"):
+        lines.append(f"- [ ] Sync the same skill to Codex at `{codex_target}`")
+        lines.append(f"- [ ] Update `{index_file}` with Claude: yes and Codex: yes")
+    else:
+        lines.append(f"- [ ] If Codex native triggering is needed, sync to `{codex_target}`")
+        lines.append(f"- [ ] Update `{index_file}` with Claude/Codex install status")
+    lines.append("- [ ] Do not create a full SOP under `rules/skills/*.md`; keep `rules/skills` as index/bridge only")
+    lines.append("- [ ] If rejected: delete this file or move to `contexts/thought_review/rejected/`")
+    return "\n".join(lines)
 
 
 def run_agentic_reflection(end_date: str, dry_run: bool = False, force: bool = False) -> int:
@@ -484,6 +647,7 @@ def run_agentic_reflection(end_date: str, dry_run: bool = False, force: bool = F
         raw_path.write_text(response_text, encoding="utf-8")
         print(f"[write] Raw response saved to {raw_path}")
         return 1
+    data = normalize_promotion_targets(data)
 
     # Generate report
     report = generate_report(data, week_entries, end_date)
@@ -519,6 +683,12 @@ def run_agentic_reflection(end_date: str, dry_run: bool = False, force: bool = F
             print("[gc] No matching entries found for removal.")
     else:
         print("[*] No GC removals suggested.")
+
+    hard_gc_stats = apply_hard_retention_gc(OBSERVATIONS_PATH)
+    if hard_gc_stats and any(hard_gc_stats.values()):
+        print(f"[gc] Applied hard retention rules: {hard_gc_stats}")
+    else:
+        print("[gc] No hard-retention cleanup needed.")
 
     # Auto-commit and push to GitHub (async, non-blocking)
     _git_auto_sync(end_date, [reflection_path, OBSERVATIONS_PATH] + [PROMOTIONS_DIR])
@@ -619,6 +789,17 @@ def execute_observations_gc(gc_plan: dict, observations_path: Path) -> int:
 
     observations_path.write_text("\n".join(final) + "\n", encoding="utf-8")
     return removed
+
+
+def apply_hard_retention_gc(observations_path: Path) -> dict[str, int]:
+    """Apply non-negotiable retention rules independent of LLM GC suggestions."""
+    if not observations_path.exists():
+        return {}
+    content = observations_path.read_text(encoding="utf-8")
+    cleaned, stats = cleanup_observations_content(content)
+    if cleaned != content:
+        observations_path.write_text(cleaned, encoding="utf-8")
+    return stats
 
 
 def _summary_matches(summary: str, line: str) -> bool:
