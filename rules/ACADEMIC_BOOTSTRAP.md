@@ -23,6 +23,9 @@ meta-discussion about the academic infrastructure itself.
   and journal-facing prose.
 - Keep context loading proportional to the task.
 - Prefer project-local instructions and skills when they directly apply.
+- This infrastructure evolves. Use claude-mem to retrieve prior discussions
+  before making methodological or design decisions. Consult axioms actively —
+  they are accumulated research judgment, not textbook knowledge.
 
 ## Routing
 
