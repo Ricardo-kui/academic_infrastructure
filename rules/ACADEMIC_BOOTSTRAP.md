@@ -26,18 +26,9 @@ meta-discussion about the academic infrastructure itself.
 
 ## Routing
 
-- Paper-writing bottlenecks: use `paper-writing-stack` or section-specific
-  writing/review skills.
-- Introduction: use `write-introduction`, `intro-review`, or
-  `diagnose-introduction`.
-- Theory and hypotheses: use `write-theory`, `theory-review`, or
-  `write-theory-and-hypotheses`.
-- Methods, causal inference, and empirical design: use `empirical-intake`,
-  `causal-analysis`, `did-analysis`, `stata`, or `stata-regression`.
-- Results and discussion: use `write-results`, `results-review`,
-  `write-discussion`, or `discussion-review`.
-- Literature and citations: use `literature-review`,
-  `literature-notes-obsidian`, `articlefeed`, or `citation-management`.
+For skill dispatch and tool selection, see the Skill Dispatch table in
+`AGENTS.md` — it is the canonical skill-routing source and is loaded as
+project context in every session.
 
 ## Escalation To Full Rules
 
