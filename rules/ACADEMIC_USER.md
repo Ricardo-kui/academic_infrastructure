@@ -14,7 +14,7 @@ status: active
 - 当前项目状态：按 `ACADEMIC_WORKSPACE.md` 路由读取 Vault `index.md`、项目 Context Packet、项目作战室或 dashboard
 - 具体理论原则：见 `rules/axioms/INDEX.md`
 - 写作风格细则：见 `rules/ACADEMIC_COMMUNICATION.md`
-- 任务执行方式：见 `rules/skills/SKILL_INDEX.md`
+- 任务执行方式：见 `AGENTS.md` Skill Dispatch 表（已作为项目上下文加载）
 
 ## 基本画像
 
