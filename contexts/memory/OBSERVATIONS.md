@@ -43,13 +43,36 @@ status: active
 ## Daily Observations
 
 <!-- observer.py / Claude cron 在此追加 -->
+### Date: 2026-07-21
+
+🔴 **理论突破 / 重大决策**
+- [#产品召回] 药品FAERS ASCII全量下载完成，nb15 notebook执行通过 (M5药品端关键数据底座建成，项目里程碑) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Plan - nb15 FAERS 药品不良事件匹配 - 2026-07-21.md]]
+
+🟡 **方法决策 / 写作判断**
+- [#产品召回] 药品FAERS匹配方案从API反查改为全量ASCII下载+药名匹配 (核心方法口径变更，绕过API配额硬约束，影响后续所有药品端分析) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Plan - nb15 FAERS 药品不良事件匹配 - 2026-07-21.md]]
+- [#产品召回] 药品匹配键从NDC精确匹配降级为generic/brand级，精度降级需声明 (核心变量测量方案变更，影响与Wowak可比性和论文声明) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Plan - nb15 FAERS 药品不良事件匹配 - 2026-07-21.md]]
+- [#产品召回] FAERS ASCII字段映射与Wowak筛选口径对齐完成 (核心假设验证（API不可行）后新方案落地，方法学推进) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\Plan - nb15 FAERS 药品不良事件匹配 - 2026-07-21.md]]
+
+### Date: 2026-07-07
+
+🟢 **常规进展 / 阅读记录**
+- [#方法论] Batch 13 完成 Lashley & Pollock 2020 定性过程研究解构，扩展方法论覆盖范围 (新增定性过程研究方法论模板，补全了定量方法之外的证据层) [[00 工作台/叙述模板训练集/narrative_analysis/methods_results/mvp30/fine_grained/batch_13_lashley_pollock2020/lashley_pollock2020_waiting_to_inhale_fine_methods_results.md]]
+- [#方法论] 更新了全部22篇语料库和运行时桥接文件，整合Batch 13内容 (常规语料库整合与ID桥接更新，无实质性理论或方法判断变化) [[00 工作台/叙述模板训练集/narrative_analysis/methods_results/mvp30/fine_grained/_all_22_expression_corpus_methods_results.md]]
+
+### Date: 2026-06-23
+
+🟡 **方法决策 / 写作判断**
+- [#产品召回] [[项目作战室 - 共同所有权 × 产品召回]] [[00 工作台\项目\共同所有权 × 产品召回\90 AI drafts\Introduction front-end 草稿 - 共同所有权 × 产品召回.md]]
+
+### Date: 2026-06-20
+
+🟡 **方法决策 / 写作判断**
+- [#general] Rising income inequality has intensified scrutiny of how corporations distribute wealth, yet we understand little about how executives’ formative life experiences shape these strategic choices. We focus on the military—a “total institution” that presents a unique theoretical puzzle. Military service [[00 工作台\项目\从军经验 × 薪酬差距\Manuscript - Military Experience × Pay Gap.md]]
+
 ### Date: 2026-06-02
 
 🟡 **方法决策 / 写作判断**
 - [#产品召回] Introduction Packet 修正文献定位，明确Darby和Wowak为锚文 (文献定位修正影响Gap表述和理论贡献声明，属于写作关键修改) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\Introduction Packet - CEO regulatory focus × time to recall.md]]
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] 全局概念页更新，新增Paruchuri et al.和Ahmadi et al.文献连接 (新增核心文献连接，拓展理论接口，属于文献综述实质性推进) [[概念库\01 概念\全局概念 - CEO调节定向.md]]
 
 ### Date: 2026-05-29
 
@@ -61,9 +84,6 @@ status: active
 🔴 **理论突破 / 重大决策**
 - [#产品召回] CEO regulatory focus × recall 论文初稿完成 (项目里程碑：基准回归跑通，初稿完成) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Manuscript - CEO regulatory focus × time to recall.md]]
 - [#方法论] 叙述模板训练集新增三篇论文的精细理论/引言分析 (方法论训练集实质性推进，识别新理论架构类型) [[00 工作台\叙述模板训练集\narrative_analysis\theory\mvp30\fine_grained\batch_2026-05-26\han_pollock_paruchuri_smj_distilled_theory.md]]
-
-🟢 **常规进展 / 阅读记录**
-- [#跨专题] 知识库操作日志记录运维与文献回流 (常规运维与文献回流，无新研究判断) [[00 工作台\知识库操作日志.md]]
 
 ### Date: 2026-05-27
 
@@ -101,22 +121,6 @@ status: active
 🔴 **理论突破 / 重大决策**
 - [#产品召回] Literature Dialogue 补全完成，进入 full manuscript consistency pass (项目里程碑：文献对话补全后进入手稿一致性检查阶段) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\项目作战室 - CEO regulatory focus × time to recall.md]]
 
-### Date: 2026-05-25
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] 发现一篇JOM 2026论文，将机构所有权与产品召回速度关联，提供引言写作范本 (新锚文献，直接关联产品召回与治理理论，提供可复用的引言结构) [[00 工作台\叙述模板训练集\narrative_analysis\mvp30\darby2026_large_institutional_ownership_recall_distill-introduction-exemplar.md]]
-
-### Date: 2026-05-17
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] 梳理了CEO调节焦点与召回时机项目的核心文献簇与阅读顺序 (文献地图明确了理论锚点和阅读路径，属于文献综述实质性推进) [[00 工作台\项目\CEO regulatory focus × time to recall\90 AI drafts\关联文献地图 - CEO regulatory focus × time to recall.md]]
-
-### Date: 2026-05-18
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] Hoffmann et al. (2024) 被定位为 conceptual cousin 而非模板 (明确 closest-paper 的差异化定位，影响写作策略) [[00 工作台\项目\anti-SLAPP laws × product recall count and timing\90 AI drafts\背景文献笔记 - Hoffmann et al (2024) JM UD laws and product recalls.md]]
-- [#产品召回] 现实案例搜索和网络案例素材被标记为 controlled_defer (案例搜索被推迟，不影响当前核心进展) [[00 工作台\项目\anti-SLAPP laws × product recall count and timing\90 AI drafts\现实案例搜索 - anti-SLAPP laws × product recall count and timing.md]]
-
 ### Date: 2026-05-19
 
 🔴 **理论突破 / 重大决策**
@@ -125,18 +129,10 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#CEO regulatory focus] Methods Packet 新增 Darby et al. (2026) 作为外部治理基准锚 (引入新锚文校准测量、方法和效应量，提升方法可信度) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\Methods and Results Packet - CEO regulatory focus × time to recall.md]]
 
-🟢 **常规进展 / 阅读记录**
-- [#CEO regulatory focus] Context Packet 和 Theory Packet 常规更新，无实质性理论或方法变动 (文件内容为已有信息的整理和重申，无新判断或突破) [[00 工作台\项目\CEO regulatory focus × time to recall\00 Active\Context Packet - CEO regulatory focus × time to recall.md]]
-- [#CEO paranoia] Context Packet 常规更新，无实质性理论或方法变动 (文件内容为已有信息的整理和重申，无新判断或突破) [[00 工作台\项目\CEO paranoia × time to recall\00 Active\Context Packet - CEO paranoia × time to recall.md]]
-
 ### Date: 2026-05-20
 
 🟡 **方法决策 / 写作判断**
 - [#产品召回] 建立paranoia与overconfidence/regulatory focus的构念区分笔记 (明确构念区分路径，支撑discriminant validity论证) [[00 工作台\项目\CEO paranoia × time to recall\90 AI drafts\关联文献地图 - CEO paranoia × time to recall.md]]
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] 锚定Wu et al (2025) SMJ作为叙事结构先例与discriminant validity方法先例 (新锚文献提供顶刊验证的contingency叙事骨架和区分效度方法先例) [[00 工作台\项目\CEO paranoia × time to recall\90 AI drafts\深度阅读笔记 - Wu et al (2025) SMJ anti-SLAPP 与预防性CSP.md]]
-- [#产品召回] 更新文献证据包，调整Recall正式层默认路由 (常规文献整理与路由优化，无实质性理论判断) [[00 工作台\项目\CEO paranoia × time to recall\00 Active\文献证据包 - CEO paranoia × time to recall.md]]
 
 ### Date: 2026-05-21
 
@@ -155,9 +151,6 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#CEO regulatory focus × time to recall] 假设推导解构笔记诊断H1/H2支撑偏薄、引文尾注化、缺少收尾句 (写作诊断指向假设段落的实质性修改方向) [[00 工作台\项目\CEO regulatory focus × time to recall\90 AI drafts\原文假设推导解构与对照 - CEO regulatory focus × time to recall.md]]
 
-🟢 **常规进展 / 阅读记录**
-- [#共同所有权] 文献证据包新增Batch 8C回流，建立稳定证据链与使用纪律 (证据链结构化是文献综述实质性推进) [[00 工作台\项目\共同所有权 × 产品召回\00 Active\文献证据包 - 共同所有权 × 产品召回.md]]
-
 ### Date: 2026-05-23
 
 🔴 **理论突破 / 重大决策**
@@ -166,10 +159,6 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#产品召回] Introduction outline完成，绑定narrative slots到具体文献和模板，明确gap类型为Incompleteness (项目里程碑：写作框架确定，gap定位和贡献声明已绑定) [[00 工作台/项目/CEO regulatory focus × time to recall/EN/Section Outlines/introduction_outline.md]]
 - [#产品召回] Discussion、Methods、Results、Theory四个outline创建为占位符，约束条件已写入 (写作框架扩展，但内容尚未填充) [[00 工作台/项目/CEO regulatory focus × time to recall/EN/Section Outlines/discussion_outline.md]]
-
-🟢 **常规进展 / 阅读记录**
-- [#跨专题] 知识库运维：关闭Copilot autosave、清理工作台归档、执行RAG激活计划 (常规运维，无学术判断变更) [[00 工作台/知识库操作日志.md]]
-- [#跨专题] 回流Chung, Low, & Rust (2023) JAMS至canonical层并更新MOC (文献整理，已有原子层笔记，无新发现) [[00 工作台/知识库操作日志.md]]
 
 ### Date: 2026-05-24
 
@@ -180,10 +169,6 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#产品召回] Context Packet EN 完成术语锁定和核心主张定义 (术语锁定和核心主张定义是写作的关键基础) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Context Packet EN.md]]
 
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] Evidence Matrix 新增 Shi et al. (2026) 和 Wu et al. (2026) 的证据绑定 (新文献绑定到证据矩阵，支撑理论对话) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Evidence Matrix.md]]
-- [#产品召回] Concept Map EN 和 Evidence Matrix 完成英文版本创建 (常规文件翻译和整理，无实质性学术判断变化) [[00 工作台\项目\CEO regulatory focus × time to recall\EN\Concept Map EN.md]]
-
 ### Date: 2026-05-12
 
 🔴 **理论突破 / 重大决策**
@@ -192,9 +177,6 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#共同所有权] 确定使用 MHHI delta 作为共同所有权测量，放弃 HHCO（He & Huang 2017），因为 MHHI delta 在反竞争文献中更成熟。
 - [#竞业协议] anti-SLAPP 项目改用 staggered DiD + event study，放弃 simple DiD，因为州级采纳时间不同。
-
-🟢 **常规进展 / 阅读记录**
-- [#产品召回] 完成 Eilert et al. (2017) JM 召回时机文献笔记。
 
 ### Date: 2026-05-13
 
@@ -209,9 +191,6 @@ status: active
 🟡 **方法决策 / 写作判断**
 - [#共同所有权] FirmAwarenessDate 口径确认：以 NHTSA 首次公开披露日期为准，而非企业内部知晓日期。
 - [#竞业协议] IDD × 广告支出项目确认 staggered DiD 设计，但需处理多期处理效应的异质性问题。
-
-🟢 **常规进展 / 阅读记录**
-- [#竞业协议] 阅读 Hoffmann et al. (2024) JM 关于 UD laws 与产品召回的文献。
 
 ### Date: 2026-05-15
 
