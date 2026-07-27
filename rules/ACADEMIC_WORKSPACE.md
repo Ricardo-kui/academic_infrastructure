@@ -85,6 +85,12 @@ status: active
 | 写或审论文 section | `AGENTS.md` Skill Dispatch → write/review/pollock 相关 skill |
 | 跨专题找连接 | `tools/bridge_detector.py` → 对应专题入口 |
 
+## Agent 协作原则
+
+给子任务或工具（Agent、Workflow、Skill、Bash）下达任务时，提供目标、上下文和质量标准，让执行者自行读取所需材料。不把 agent 当作简单 API，也不在 prompt 中塞入大量预处理上下文来替代它自己的检索和判断。
+
+关注最终学术质量，而不是固定步骤是否被机械执行。若信息缺失，继续向下查原始笔记、PDF extract、数据字典或代码，不停在二手总结。
+
 ## 命名规则
 
 - 全局层规则文件：英文大写或 snake_case，保持现有约定。
