@@ -43,6 +43,11 @@ status: active
 ## Daily Observations
 
 <!-- observer.py / Claude cron 在此追加 -->
+### Date: 2026-08-03
+
+🟢 **常规进展 / 阅读记录**
+- [#理论] 新增Vidal & Mitchell (2015)论文，探讨绩效反馈与资产剥离的资源重构关系。 (引入新锚文，扩展绩效反馈理论在资产剥离中的应用，对理论框架有实质推进。) [[00 工作台/叙述模板训练集/_parsed_texts/mvp30/EBSCO-FullText-08_03_2026.md]]
+
 ### Date: 2026-07-21
 
 🔴 **理论突破 / 重大决策**
