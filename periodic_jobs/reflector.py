@@ -45,6 +45,85 @@ def _configure_utf8_stdio() -> None:
 
 _configure_utf8_stdio()
 
+# ── Skill Domain Map ─────────────────────────────────────────────────────
+# Dynamic evolution must NOT create standalone skills. When the observer
+# detects a recurrent pattern, the reflector maps it to an existing skill
+# and suggests a corpus addition — never a new skill. Only flag as genuinely
+# new if no existing skill covers that domain.
+
+SKILL_DOMAIN_MAP: dict[str, list[str]] = {
+    "introduction": [
+        "write-introduction", "intro-review", "diagnose-introduction",
+    ],
+    "theory_hypothesis": [
+        "write-theory", "theory-review", "hypothesis-generation",
+    ],
+    "methods_identification": [
+        "write-methods", "methods-review", "causal-analysis",
+        "did-analysis", "empirical-pipeline-stata",
+    ],
+    "results": [
+        "write-results", "results-review",
+    ],
+    "discussion": [
+        "write-discussion", "discussion-review",
+    ],
+    "writing_quality": [
+        "humanizer", "proofread", "pollock-qc", "paper-review",
+    ],
+    "literature": [
+        "literature-review", "literature-notes-obsidian", "articlefeed",
+    ],
+    "revision": [
+        "revision-coach",
+    ],
+}
+
+SKILL_KEYWORD_PATTERNS: dict[str, list[str]] = {
+    "write-introduction": [
+        "intro", "引言", "gap", "贡献定位", "hook", "opening",
+        "differentiation", "closest-paper", "narrative slot",
+    ],
+    "write-theory": [
+        "theor", "hypoth", "机制", "假设", "理论", "条件化",
+        "conditionalize", "moderat", "contingency", "boundary condition",
+    ],
+    "write-methods": [
+        "method", "did", "iv", "识别", "稳健", "变量", "测量",
+        "样本", "sample", "specification", "identification",
+    ],
+    "write-results": [
+        "result", "table", "结果", "表格", "系数", "coefficient",
+        "显著性", "significance",
+    ],
+    "write-discussion": [
+        "discuss", "讨论", "贡献", "implication", "limitation",
+    ],
+    "humanizer": [
+        "ai", "写作风格", "润色", "表达", "段落", "语料", "措辞",
+    ],
+    "revision-coach": [
+        "reviewer", "审稿", "回复", "revision", "r&r", "response",
+    ],
+    "literature-review": [
+        "文献", "搜索", "综述", "literature review", "bibliograph",
+    ],
+}
+
+
+def map_to_existing_skill(keyword: str) -> str | None:
+    """Check if a detected pattern belongs to an existing skill's domain.
+
+    Returns the primary skill name if matched, None if genuinely new territory
+    (which should be rare — most academic writing patterns are covered).
+    """
+    kw = keyword.lower()
+    for skill, patterns in SKILL_KEYWORD_PATTERNS.items():
+        if any(p in kw for p in patterns):
+            return skill
+    return None
+
+
 # Promotion thresholds
 PROMOTION_RULES = {
     "axiom": {
@@ -52,7 +131,7 @@ PROMOTION_RULES = {
         "min_weeks": 2,         # Verified across 2+ weeks
         "min_severity": "🔴",   # At least one 🔴 observation
     },
-    "skill_suggestion": {
+    "skill_corpus_addition": {
         "min_occurrences": 3,   # Same task type appears 3+ times
         "min_severity": "🟡",   # At least 🟡
     },
@@ -223,17 +302,43 @@ def generate_promotions(entries: list[dict], patterns: dict) -> list[dict]:
                 }
             )
 
-    # Check recurring keywords for skill suggestions
+    # Check recurring keywords — map to EXISTING skills, never suggest new ones.
     for rec in patterns["recurring"]:
         if rec["count"] >= 3:
-            promotions.append(
-                {
-                    "type": "skill_suggestion",
-                    "reason": f"Recurring activity '{rec['keyword']}' ({rec['count']} times) in {', '.join(rec['tags'])}",
-                    "suggested_action": f"Consider creating a reusable workflow for '{rec['keyword']}'",
-                    "sample": rec["sample"],
-                }
-            )
+            existing_skill = map_to_existing_skill(rec["keyword"])
+            if existing_skill:
+                promotions.append(
+                    {
+                        "type": "skill_corpus_addition",
+                        "reason": (
+                            f"Recurring activity '{rec['keyword']}' ({rec['count']} times) "
+                            f"in {', '.join(rec['tags'])} — maps to existing skill "
+                            f"`{existing_skill}`"
+                        ),
+                        "target_skill": existing_skill,
+                        "suggested_action": (
+                            f"Add this pattern to `{existing_skill}` corpus/checklist. "
+                            f"Do NOT create a new standalone skill."
+                        ),
+                        "sample": rec["sample"],
+                    }
+                )
+            else:
+                # Genuinely new territory — very rare; flag for manual review only.
+                promotions.append(
+                    {
+                        "type": "skill_suggestion",
+                        "reason": (
+                            f"Recurring activity '{rec['keyword']}' ({rec['count']} times) "
+                            f"in {', '.join(rec['tags'])} — NO existing skill matched"
+                        ),
+                        "suggested_action": (
+                            f"Manual review: could this be a corpus addition to an "
+                            f"existing skill, or is it genuinely new territory?"
+                        ),
+                        "sample": rec["sample"],
+                    }
+                )
 
     return promotions
 
@@ -290,8 +395,13 @@ def generate_reflection_report(
             lines.append("")
             if promo["type"] == "axiom_candidate":
                 lines.append("- **Action**: Consider formalizing into `rules/axioms/` if verified again next week.")
+            elif promo["type"] == "skill_corpus_addition":
+                lines.append(
+                    f"- **Action**: Add to `{promo.get('target_skill', 'unknown')}` corpus/checklist. "
+                    f"Do NOT create a new skill."
+                )
             elif promo["type"] == "skill_suggestion":
-                lines.append("- **Action**: Consider creating/updating a native skill under `.claude/skills/<name>/SKILL.md`, then update `rules/skills/SKILL_INDEX.md` as the bridge index.")
+                lines.append("- **Action**: Manual review required — no existing skill matched. Verify before creating anything new.")
             lines.append("")
     else:
         lines.append("- No promotion suggestions this week.")
